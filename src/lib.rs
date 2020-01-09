@@ -133,6 +133,7 @@ pub mod file_type;
 pub mod font;
 pub mod handle;
 pub mod hinting;
+pub mod id;
 pub mod loader;
 pub mod loaders;
 pub mod metrics;

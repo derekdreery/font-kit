@@ -44,7 +44,8 @@ use crate::error::{FontLoadingError, GlyphLoadingError};
 use crate::file_type::FileType;
 use crate::handle::Handle;
 use crate::hinting::HintingOptions;
-use crate::loader::{FallbackResult, Loader};
+use crate::id::{FontId, OPENTYPE_TABLE_TAG_HEAD};
+use crate::loader::{FallbackResult, FontTransform, Loader};
 use crate::metrics::Metrics;
 use crate::outline::OutlineSink;
 use crate::properties::{Properties, Stretch, Style, Weight};
@@ -193,7 +194,19 @@ impl Font {
         self.core_text_font.clone()
     }
 
-    /// Returns the PostScript name of the font. This should be globally unique.
+    /// Returns a globally-unique identifier for this font.
+    #[inline]
+    pub fn id(&self) -> FontId {
+        let postscript_name = self.core_text_font.postscript_name();
+        let head_table_data = self.core_text_font.get_font_table(OPENTYPE_TABLE_TAG_HEAD);
+        let head_table_data = match head_table_data {
+            None => &[],
+            Some(ref data) => data.bytes(),
+        };
+        FontId::from_opentype_head_table(postscript_name, head_table_data, true)
+    }
+
+    /// Returns the PostScript name of the font.
     #[inline]
     pub fn postscript_name(&self) -> Option<String> {
         Some(self.core_text_font.postscript_name())
@@ -637,6 +650,11 @@ impl Loader for Font {
     #[inline]
     fn native_font(&self) -> Self::NativeFont {
         self.native_font()
+    }
+
+    #[inline]
+    fn id(&self) -> FontId {
+        self.id()
     }
 
     #[inline]

@@ -22,6 +22,7 @@ use crate::error::{FontLoadingError, GlyphLoadingError};
 use crate::file_type::FileType;
 use crate::handle::Handle;
 use crate::hinting::HintingOptions;
+use crate::id::FontId;
 use crate::metrics::Metrics;
 use crate::outline::OutlineSink;
 use crate::properties::Properties;
@@ -103,7 +104,10 @@ pub trait Loader: Clone + Sized {
     /// Returns the wrapped native font handle.
     fn native_font(&self) -> Self::NativeFont;
 
-    /// Returns the PostScript name of the font. This should be globally unique.
+    /// Returns a globally-unique identifier for the font.
+    fn id(&self) -> FontId;
+
+    /// Returns the PostScript name of the font, if available.
     fn postscript_name(&self) -> Option<String>;
 
     /// Returns the full name of the font (also known as "display name" on macOS).
